@@ -4,12 +4,71 @@
     </h2>
 </x-slot>
 
+
+
+
 <div class="py-12 flex items-center justify-center">
-    <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-            <div class="p-6 text-gray-900">
-                <div class="w-12/12 bg-slate-200 rounded-md mt-2">
-                    <div class="mt-6 px-6">
+    <div class="max-w-7xl mx-auto flex">
+        {{-- <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="p-6 text-gray-900"> --}}
+
+                <div class="w-7/12">
+                    {{-- @if ($this->tasksByStatus->count() > 0)
+                        <livewire:tasks.tasks-count :tasksByStatus="$this->tasksByStatus" />
+                    @endif --}}
+                    @if ($tasks->count() > 0)
+                        <div class="px-6">
+                            @foreach ($tasks as $task)
+                                <div
+                                    class="my-4 px-4 py-6 bg-white rounded-lg shadow hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700">
+                                    <div class="p-4 leading-normal">
+                                        <div class="flex justify-between mb-4">
+                                            <h5 class="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+                                                {{ $task->title }}
+                                            </h5>
+                                            <span
+                                                class="px-2 py-1 border border-slate-200 rounded-md flex justify-end">{{ $task->deadline->diffForHumans() }}</span>
+                                        </div>
+                                        <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">{{ $task->description }}</p>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <div>
+                                            @foreach (App\Enums\StatusType::cases() as $case)
+                                                <button type="button"
+                                                    wire:click="changeStatus({{ $task->id }}, '{{ $case->value }}')"
+                                                    @class([
+                                                        'inline-flex items-center px-4 py-2 bg-white border rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-25 transition ease-in-out duration-150',
+                                                        $case->color() => true,
+                                                    ])
+                                                    {{ $case->value == $task->status->value ? 'disabled' : '' }}>
+                                                    {{ Str::of($case->value)->headline() }}
+                                                </button>
+                                            @endforeach
+                                        </div>
+                                        <div>
+                                            <x-primary-button wire:click="$dispatch('edit-task', {id: {{ $task->id }}})"
+                                                class="bg-green-500 hover:bg-green-700">Edit</x-primary-button>
+                                            <x-primary-button wire:click="delete({{ $task->id }})"
+                                                wire:confirm="Are you sure you want to delete this task"
+                                                class="bg-red-500 hover:bg-red-700">Delete</x-primary-button>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                        {{-- <div class="mt-2 mb-12 p-2">
+                            {{ $tasks->links() }}
+                        </div> --}}
+                    @else
+                        <div class="mt-2 mb-12 p-2">
+                            <h1 class="text-2xl text-semibold text-indigo-500">No Tasks.</h1>
+                        </div>
+                    @endif
+                </div>
+
+
+                <div class="w-80">
+                    <div class="mt-6 p-6 rounded-md mt-2 bg-white">
                         <div>
                             <h1 class="text-2xl text-center font-semibold">Welcome, <span
                                     class="text-indigo-500">{{ Auth::user()->name }}</span></h1>
@@ -22,15 +81,15 @@
                                     <span class="font-medium">{{ session('success') }}</span>
                                 </div>
                             @endif
-                            <form wire:submit="save">
+                            <form wire:submit.prevent="save">
                                 <div class="mb-3">
                                     <label for="title"
                                         class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Title</label>
-                                    <input wire:model="title" type="text"
+                                    <input wire:model="form.title" type="text"
                                         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                         id="title">
                                     <div>
-                                        @error('title')
+                                        @error('form.title')
                                             <span class="text-red-500 text-sm">{{ $message }}</span>
                                         @enderror
                                     </div>
@@ -38,11 +97,11 @@
                                 <div class="mb-3">
                                     <label for="slug"
                                         class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Slug</label>
-                                    <input wire:model="slug" type="text"
+                                    <input wire:model="form.slug" type="text"
                                         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                         id="slug">
                                     <div>
-                                        @error('slug')
+                                        @error('form.slug')
                                             <span class="text-red-500 text-sm">{{ $message }}</span>
                                         @enderror
                                     </div>
@@ -50,11 +109,11 @@
                                 <div class="mb-3">
                                     <label for="description"
                                         class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Description</label>
-                                    <textarea wire:model="description" type="text"
+                                    <textarea wire:model="form.description" type="text"
                                         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                         id="description"></textarea>
                                     <div>
-                                        @error('description')
+                                        @error('form.description')
                                             <span class="text-red-500 text-sm">{{ $message }}</span>
                                         @enderror
                                     </div>
@@ -63,14 +122,14 @@
                                     <div class="mb-3">
                                         <label for="status"
                                             class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Status</label>
-                                        <select id="status" wire:model="status"
+                                        <select id="status" wire:model="form.status"
                                             class=" bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                                             @foreach (\App\Enums\StatusType::cases() as $status)
                                                 <option value="{{ $status->value }}">{{ $status->name }}</option>
                                             @endforeach
                                         </select>
                                         <div>
-                                            @error('status')
+                                            @error('form.status')
                                                 <span class="text-red-500 text-sm">{{ $message }}</span>
                                             @enderror
                                         </div>
@@ -78,14 +137,14 @@
                                     <div class="mb-3">
                                         <label for="priority"
                                             class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Priority</label>
-                                        <select id="priority" wire:model="priority"
+                                        <select id="priority" wire:model="form.priority"
                                             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                                             @foreach (\App\Enums\PriorityType::cases() as $priority)
                                                 <option value="{{ $priority->value }}">{{ $priority->name }}</option>
                                             @endforeach
                                         </select>
                                         <div>
-                                            @error('priority')
+                                            @error('form.priority')
                                                 <span class="text-red-500 text-sm">{{ $message }}</span>
                                             @enderror
                                         </div>
@@ -95,10 +154,10 @@
                                 <div class="mb-3">
                                     <label for="slug"
                                         class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Deadline</label>
-                                    <input wire:model="deadline" type="date"
+                                    <input wire:model="form.deadline" type="date"
                                         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                                     <div>
-                                        @error('deadline')
+                                        @error('form.deadline')
                                             <span class="text-red-500 text-sm">{{ $message }}</span>
                                         @enderror
                                     </div>
@@ -128,7 +187,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
+            {{-- </div>
+        </div> --}}
     </div>
 </div>
