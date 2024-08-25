@@ -37,6 +37,10 @@ new class extends Component
                         {{ __('Tasks') }}
                     </x-nav-link>
                 </div>
+
+                <div>
+                    <livewire:search />
+                </div>
             </div>
 
             <!-- Settings Dropdown -->
