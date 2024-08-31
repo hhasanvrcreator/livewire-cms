@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Models\Image;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Rule;
 use Livewire\Component;
@@ -39,6 +40,12 @@ class ImageIndex extends Component
     public function images()
     {
         return Image::all();
+    }
+
+    public function download($id)
+    {
+        $image = Image::find($id);
+        return Storage::disk('public')->download($image->path);
     }
 
     public function render()

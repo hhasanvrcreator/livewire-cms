@@ -25,6 +25,12 @@ class TasksList extends Component
         $this->dispatch('task-created');
     }
 
+    public function delete(Task $task)
+    {
+        $task->delete();
+        unset($this->tasksByStatus);
+    }
+
     #[Computed]
     public function tasks()
     {
